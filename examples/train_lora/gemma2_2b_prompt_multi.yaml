@@ -1,0 +1,90 @@
+# —— 基座模型 ——
+model_name_or_path: models/gemma-2-2b-it   # 本地模型路径
+trust_remote_code: true
+
+
+stage: sft                        
+do_train: true
+finetuning_type: freeze           
+freeze_trainable_layers: 0        
+dataset:
+  - hun                               # 当前10方向混合训练集
+dataset_dir: data
+template: gemma2                 
+cutoff_len: 1024                  
+max_samples: null                 
+overwrite_cache: true
+preprocessing_num_workers: 16
+dataloader_num_workers: 8
+
+enable_text_prefix: true
+text_prefix_template: "Translate {src} into {tgt}."  # 每条样本前添加翻译方向说明
+
+use_prompt_manager: true          # 启用编码器
+train_prompts: true               # 训练时更新编码器参数
+save_prompts: true                # checkpoint 时保存编码器权重
+prompt_save_dir: prompts/gemma2
+
+lang_pairs:
+  - cs-en
+  - zh-en
+  - de-en
+  - ru-en
+  - vi-en
+  - en-cs
+  - en-zh
+  - en-de
+  - en-ru
+  - en-vi
+
+prompt_encoder_type: sda_ra       # MeRP的编码器代称是 sda_ra
+prompt_encoder_prompt_length: 32        # 注入 LLM 的虚拟 token 数量 P（即 prompt_length）
+prompt_encoder_num_lang_pairs: 10      # 必须等于 len(lang_pairs)
+prompt_encoder_lr: 6e-4               # 编码器独立学习率
+vector_prompt_position: prefix         
+
+sda_trunk_dim: 256                # 共享Trunk的中间维度
+sda_num_adapters: 12              
+sda_adapter_rank: 16              # 每个adapter的秩r
+sda_dir_dim: 64                   # 方向嵌入维度d_dir
+sda_up_proj_init_std: 1.1e-3        # private分支冷启动幅度
+
+sda_enable_adapters: true         # true=启用Expert Pool路由, false=跳过adapter直接用trunk输出
+sda_enable_contrastive_loss: true # true=启用对比路由损失L_contrast（鼓励路由权重多样性）
+sda_enable_anchor_loss: true      # 开启软一向一专
+
+
+sda_contrastive_loss_weight: 0.20
+sda_anchor_loss_weight_start: 0.30
+sda_anchor_loss_weight_end: 0.05
+sda_anchor_margin: 0.14
+sda_anchor_margin_weight: 0.25
+sda_anchor_target_main_prob: 0.87
+sda_anchor_target_overflow_prob: 0.065
+sda_anchor_overflow_expert_ids: [10, 11]  # overflow experts的索引
+sda_anchor_expert_map:
+  cs-en: 0
+  zh-en: 1
+  de-en: 2
+  ru-en: 3
+  vi-en: 4
+  en-cs: 5
+  en-zh: 6
+  en-de: 7
+  en-ru: 8
+  en-vi: 9
+
+output_dir: output/gemma2
+logging_steps: 1              
+save_steps: -1                  
+encoder_save_steps: 2105        
+plot_loss: true          
+
+per_device_train_batch_size: 4   
+gradient_accumulation_steps: 32   
+bf16: true                      
+num_train_epochs: 3             
+gradient_checkpointing: true  
+warmup_ratio: 0.08             
+finetuning_max_grad_norm: 1.0    
+enable_thinking: false

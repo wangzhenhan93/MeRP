@@ -1,0 +1,32 @@
+# The batch generation can be SLOW using this config.
+# For faster inference, we recommend to use `scripts/vllm_infer.py`.
+
+### model   qwen2_5_1p5b_lora_predict.yaml
+
+model_name_or_path: F:/github/Qwen2.5-1.5B-Instruct
+adapter_name_or_path: saves/qwen2_5/lora/sft
+trust_remote_code: true
+
+### method
+stage: sft
+do_predict: true
+finetuning_type: lora
+
+### dataset
+eval_dataset: identity,alpaca_en_demo
+template: qwen
+cutoff_len: 2048
+max_samples: 10
+overwrite_cache: true
+preprocessing_num_workers: 4
+dataloader_num_workers: 0
+
+### output
+output_dir: saves/qwen2_5/lora/predict
+overwrite_output_dir: true
+report_to: none  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+
+### eval
+per_device_eval_batch_size: 1
+predict_with_generate: true
+ddp_timeout: 180000000

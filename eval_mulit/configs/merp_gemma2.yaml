@@ -1,0 +1,73 @@
+model_name_or_path: models/gemma-2-2b-it
+trust_remote_code: true
+
+stage: sft
+finetuning_type: freeze
+template: gemma2
+
+dataset_dir: data
+cutoff_len: 1024
+enable_text_prefix: true
+text_prefix_template: "Translate {src} into {tgt}."
+
+use_prompt_manager: true
+train_prompts: true
+save_prompts: false
+use_prompts: true
+prompt_save_dir: prompts/gemma2
+
+lang_pairs:
+  - cs-en
+  - zh-en
+  - de-en
+  - ru-en
+  - vi-en
+  - en-cs
+  - en-zh
+  - en-de
+  - en-ru
+  - en-vi
+
+
+prompt_encoder_type: sda_ra
+prompt_encoder_prompt_length: 32
+prompt_encoder_num_lang_pairs: 10
+vector_prompt_position: prefix
+
+sda_trunk_dim: 256
+sda_num_adapters: 12              
+sda_adapter_rank: 16   
+sda_dir_dim: 64
+sda_up_proj_init_std: 1.1e-3
+sda_enable_adapters: true
+sda_enable_contrastive_loss: false
+sda_enable_anchor_loss: true
+sda_anchor_loss_weight_start: 0.30
+sda_anchor_loss_weight_end: 0.05
+sda_anchor_margin: 0.14
+sda_anchor_margin_weight: 0.25
+sda_anchor_target_main_prob: 0.87
+sda_anchor_target_overflow_prob: 0.065
+sda_anchor_overflow_expert_ids: [10, 11]  # overflow experts的索引
+sda_anchor_expert_map:
+  cs-en: 0
+  zh-en: 1
+  de-en: 2
+  ru-en: 3
+  vi-en: 4
+  en-cs: 5
+  en-zh: 6
+  en-de: 7
+  en-ru: 8
+  en-vi: 9
+
+
+do_sample: false
+num_beams: 5
+max_new_tokens: 512
+repetition_penalty: 1.0
+
+output_dir: results/gemma2
+per_device_eval_batch_size: 16
+bf16: true
+enable_thinking: false

@@ -1,0 +1,57 @@
+### SDA-NM 推理配置 (Gemma-2-2B-IT, 10 翻译方向)
+
+# —— 基座模型 ——
+model_name_or_path: /nas/wangzhenhan/LaRT/models/gemma-2-2b-it
+trust_remote_code: true
+
+# —— 微调方式（必须与训练一致） ——
+stage: sft
+finetuning_type: freeze           # 与训练一致
+
+# —— 数据集 ——
+dataset_dir: data
+template: gemma2
+cutoff_len: 1024
+
+# —— 文本前缀（必须与训练一致） ——
+enable_text_prefix: true
+text_prefix_template: "Translate {src} into {tgt}."
+
+# —— Prompt Manager ——
+use_prompt_manager: true
+train_prompts: true               # 推理时也需要 true 以加载编码器结构
+save_prompts: false               # 推理不需要保存
+prompt_save_dir: prompts/sda_nm   # 训练时保存的编码器权重路径（需要与训练一致）
+
+# —— 翻译方向（推理时可指定子集，此处列全部） ——
+lang_pairs: [ru-en, en-ru, de-en, en-de, cs-en, en-cs, en-zh, zh-en, en-my, my-en]
+
+# —— SDA-NM 编码器架构（必须与训练完全一致） ——
+prompt_encoder_type: sda_nm
+prompt_encoder_prompt_length: 8
+prompt_encoder_num_lang_pairs: 10
+vector_prompt_position: prefix
+
+sda_trunk_dim: 256
+sda_num_adapters: 4
+sda_adapter_rank: 16
+sda_dir_dim: 64
+sda_mask_min: 0.5
+sda_up_proj_init_std: 1.0e-4
+
+sda_enable_adapters: true
+sda_enable_neuron_mask: true
+sda_enable_contrastive_loss: false  # 推理时关闭辅助损失（不参与反向传播）
+sda_enable_balance_loss: false
+
+# —— 生成参数 ——
+do_sample: false                  # 贪心解码（确定性输出，便于评测复现）
+num_beams: 5                      # beam search 宽度
+max_new_tokens: 512               # 最大生成 token 数
+repetition_penalty: 1.0           # 重复惩罚（1.0 = 无惩罚）
+
+# —— 输出 ——
+output_dir: results/sda_nm_gemma2
+per_device_eval_batch_size: 1     # 推理 batch size（beam search 时建议为 1）
+bf16: true
+enable_thinking: false

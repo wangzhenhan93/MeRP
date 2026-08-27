@@ -1,0 +1,8 @@
+# qwen2_5_1p5b_lora_sft.yaml
+
+#model_name_or_path: F:/github/Qwen2.5-1.5B-Instruct
+#adapter_name_or_path: saves/qwen2_5/lora/sft
+model_name_or_path: F:/github/LLaMA-Factory/output/qwen2_5_lora_sft
+template: qwen
+infer_backend: huggingface  # choices: [huggingface, vllm, sglang]
+trust_remote_code: true
