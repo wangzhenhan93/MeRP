@@ -1,4 +1,4 @@
-# MeRP: Efficient Multi-Expert Routing Prompt Encoding for Multilingual Translation with LLMs
+# MeRP
 This repository provides the implementation of **MeRP** for multilingual machine translation with LLMs.
 ## 1. Dataset Preparation
 Please place the processed datasets in:
