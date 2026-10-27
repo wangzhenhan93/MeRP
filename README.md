@@ -1,5 +1,8 @@
 # MeRP
 This repository provides the implementation of **MeRP** for multilingual machine translation with LLMs.
+
+**Paper / OpenReview:** [OpenReview Forum](http://openreview.net/forum?id=NzQTDhqAHg)
+
 ## 1. Dataset Preparation
 Please place the processed datasets in:
 ```
